@@ -56,10 +56,10 @@
 
             {% if user.is_authenticated %}
 
-            <button data-toggle="collapse" data-target="#exam">Show Exam</button>
+            <button data-toggle="collapse" data-target="#exam" class="btn btn-primary">Start Exam</button>
 
             <div id="exam" class="collapse">
-                <form id="questionform" action="point to a submit view" method="post"></form>
+                <form id="questionform" action="/onlinecourse/{{course.id}}/submit/" method="post">
                     {% for question in course.question_set.all %}
                     <div class="card mt-1">
                         <div class="card-header"><h5>{{question.questionText}}</h5></div> 
@@ -68,7 +68,7 @@
                         {% for choice in question.choice_set.all %}
                         <div class="form-check">
                             <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" id="{{choice.id}}" name="choice_{{choice.id}}" value="choice_{{choice.id}}"> 
+                                <input type="checkbox" class="form-check-input" id="{{choice.id}}" name="choice_{{choice.id}}" value="{{choice.id}}"> 
                                 {{choice.choice_text}}
                             </label>
                         </div>
