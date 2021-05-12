@@ -111,8 +111,6 @@ def enroll(request, course_id):
          # Add each selected choice object to the submission object
          # Redirect to show_exam_result with the submission id
 def submit(request, course_id):
-    logger = logging.getLogger("mylogger")
-    logger.info("Submitted!")
     user=request.user
     course = get_object_or_404(Course, pk=course_id)
     enrollment = Enrollment.objects.get(user=user, course=course)
@@ -146,7 +144,18 @@ def extract_answers(request):
 def show_exam_result(request, course_id, submission_id):
     course = Course.objects.get(pk=course_id)
     submission = Submission.objects.get(pk=submission_id)
-    context = {}
+    submitted_answers = submission.choices.all()
+    user = request.user
+    correct_choices = 0
+    total_choices = 0
+    for a_choice in submitted_answers:
+        if(a_choice.is_correct):
+            correct_choices+=a_choice.question.questionGrade
+        total_choices+=a_choice.question.questionGrade
+
+    grade = (correct_choices / total_choices) * 100
+
+    context = { "course": course, "grade": grade, "user": user, "user_choices": submitted_answers }
     if request.method == 'GET':
         return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 
