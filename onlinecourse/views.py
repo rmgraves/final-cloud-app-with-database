@@ -146,16 +146,20 @@ def show_exam_result(request, course_id, submission_id):
     submission = Submission.objects.get(pk=submission_id)
     submitted_answers = submission.choices.all()
     user = request.user
-    correct_choices = 0
-    total_choices = 0
-    for a_choice in submitted_answers:
-        if(a_choice.is_correct):
-            correct_choices+=a_choice.question.questionGrade
-        total_choices+=a_choice.question.questionGrade
+    user_score = 0
+    total_score = 0
+    choice_ids = list(o.id for o in submitted_answers)
+    
+    questions = course.question_set.all()
 
-    grade = (correct_choices / total_choices) * 100
+    for a_question in questions:
+        if(a_question.is_get_score(choice_ids)):
+            user_score+=a_question.questionGrade
+        total_score+=a_question.questionGrade
 
-    context = { "course": course, "grade": grade, "user": user, "user_choices": submitted_answers }
+    grade = (user_score / total_score) * 100
+
+    context = { "course": course, "grade": grade, "user": user, "choice_ids": choice_ids}
     if request.method == 'GET':
         return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 
